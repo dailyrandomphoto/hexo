@@ -155,7 +155,7 @@ describe('generate', () => {
     fs.writeFile(pathFn.join(hexo.theme_dir, 'source', 'a.txt'), 'a'),
     fs.writeFile(pathFn.join(hexo.theme_dir, 'source', 'b.txt'), 'b'),
     fs.writeFile(pathFn.join(hexo.theme_dir, 'source', 'c.swig'), 'c')
-  ]).then(() => generate()).then(() => // Update source file
+  ]).then(() => generate()).delay(1000).then(() => // Update source file
     Promise.all([
       fs.writeFile(pathFn.join(hexo.theme_dir, 'source', 'b.txt'), 'bb'),
       fs.writeFile(pathFn.join(hexo.theme_dir, 'source', 'c.swig'), 'cc')
