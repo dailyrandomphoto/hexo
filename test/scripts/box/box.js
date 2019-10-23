@@ -175,6 +175,8 @@ describe('Box', () => {
     const name = 'a.txt';
     const path = pathFn.join(box.base, name);
     const cacheId = 'test/' + name;
+    const supportMilliseconds = fs.statSync(pathFn.join(__dirname, 'box.js')).mtime.getMilliseconds() !== 0
+      && fs.statSync(pathFn.join(__dirname, 'file.js')).mtime.getMilliseconds() !== 0;
 
     const processor = sinon.spy();
     box.addProcessor(processor);
@@ -185,7 +187,7 @@ describe('Box', () => {
       hash: util.hash('b').toString('hex')
     })).then(() => box.process()).then(() => {
       const file = processor.args[0][0];
-      file.type.should.eql('skip');
+      file.type.should.eql(supportMilliseconds ? 'skip' : 'update');
       file.path.should.eql(name);
     }).finally(() => fs.rmdir(box.base));
   });
