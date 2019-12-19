@@ -49,7 +49,7 @@
     "hexo-fs": "^2.0.0",
     "hexo-i18n": "^1.0.0",
     "hexo-log": "^1.0.0",
-    "hexo-util": "github:dailyrandomphoto/hexo-util#update-url_for-syntax",
+    "hexo-util": "github:dailyrandomphoto/hexo-util#66e5c905153be7a452a79e56740ecbe30f3edeb0",
     "js-yaml": "^3.12.0",
     "lodash": "^4.17.11",
     "micromatch": "^4.0.2",

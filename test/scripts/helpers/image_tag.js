@@ -8,9 +8,11 @@ describe('image_tag', () => {
     config: hexo.config
   };
 
-  ctx.url_for = require('../../../lib/plugins/helper/url_for').bind(ctx);
+  ctx.url_for = require('../../../lib/plugins/helper/url_for')(hexo);
 
   const img = require('../../../lib/plugins/helper/image_tag').bind(ctx);
+
+  before(() => hexo.init());
 
   it('path', () => {
     img('https://hexo.io/image.jpg').should.eql('<img src="https://hexo.io/image.jpg">');

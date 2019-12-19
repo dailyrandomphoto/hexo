@@ -1,11 +1,16 @@
 'use strict';
 
 describe('full_url_for', () => {
-  const ctx = {
-    config: { url: 'https://example.com' }
-  };
+  const Hexo = require('../../../lib/hexo');
+  const hexo = new Hexo();
+  const after_init = require('../../../lib/plugins/filter/after_init');
+  const applyConfigChange = () => after_init.call(hexo);
+  const ctx = hexo;
+  ctx.config.url = 'https://example.com';
 
-  const fullUrlFor = require('../../../lib/plugins/helper/full_url_for').bind(ctx);
+  const fullUrlFor = require('../../../lib/plugins/helper/full_url_for')(hexo);
+
+  before(() => hexo.init());
 
   it('no path input', () => {
     fullUrlFor().should.eql(ctx.config.url + '/');
@@ -19,6 +24,7 @@ describe('full_url_for', () => {
 
   it('internel url (pretty_urls.trailing_index disabled)', () => {
     ctx.config.pretty_urls = { trailing_index: false };
+    applyConfigChange();
     fullUrlFor('index.html').should.eql(ctx.config.url + '/');
     fullUrlFor('/index.html').should.eql(ctx.config.url + '/');
   });

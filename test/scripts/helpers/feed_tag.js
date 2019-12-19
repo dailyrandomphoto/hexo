@@ -8,9 +8,11 @@ describe('feed_tag', () => {
     config: hexo.config
   };
 
-  ctx.url_for = require('../../../lib/plugins/helper/url_for').bind(ctx);
+  ctx.url_for = require('../../../lib/plugins/helper/url_for')(hexo);
 
   const feed = require('../../../lib/plugins/helper/feed_tag').bind(ctx);
+
+  before(() => hexo.init());
 
   it('path', () => {
     feed('atom.xml').should.eql('<link rel="alternate" href="/atom.xml" title="Hexo">');

@@ -10,7 +10,7 @@ describe('list_archives', () => {
     page: {}
   };
 
-  ctx.url_for = require('../../../lib/plugins/helper/url_for').bind(ctx);
+  ctx.url_for = require('../../../lib/plugins/helper/url_for')(hexo);
 
   const listArchives = require('../../../lib/plugins/helper/list_archives').bind(ctx);
 

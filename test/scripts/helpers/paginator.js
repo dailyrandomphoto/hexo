@@ -13,9 +13,11 @@ describe('paginator', () => {
     config: hexo.config
   };
 
-  ctx.url_for = require('../../../lib/plugins/helper/url_for').bind(ctx);
+  ctx.url_for = require('../../../lib/plugins/helper/url_for')(hexo);
 
   const paginator = require('../../../lib/plugins/helper/paginator').bind(ctx);
+
+  before(() => hexo.init());
 
   function link(i) {
     return ctx.url_for(i === 1 ? '' : 'page/' + i + '/');

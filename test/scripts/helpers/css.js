@@ -10,7 +10,7 @@ describe('css', () => {
     config: hexo.config
   };
 
-  ctx.url_for = require('../../../lib/plugins/helper/url_for').bind(ctx);
+  ctx.url_for = require('../../../lib/plugins/helper/url_for')(hexo);
 
   const css = require('../../../lib/plugins/helper/css').bind(ctx);
 
@@ -31,6 +31,8 @@ describe('css', () => {
       }
     });
   }
+
+  before(() => hexo.init());
 
   it('a string', () => {
     assertResult(css('style'), '/style.css');

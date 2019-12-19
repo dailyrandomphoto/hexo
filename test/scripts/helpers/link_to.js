@@ -8,9 +8,11 @@ describe('link_to', () => {
     config: hexo.config
   };
 
-  ctx.url_for = require('../../../lib/plugins/helper/url_for').bind(ctx);
+  ctx.url_for = require('../../../lib/plugins/helper/url_for')(hexo);
 
   const linkTo = require('../../../lib/plugins/helper/link_to').bind(ctx);
+
+  before(() => hexo.init());
 
   it('path', () => {
     linkTo('https://hexo.io/').should.eql('<a href="https://hexo.io/" title="hexo.io">hexo.io</a>');

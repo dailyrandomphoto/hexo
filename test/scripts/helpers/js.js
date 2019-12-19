@@ -10,7 +10,7 @@ describe('js', () => {
     config: hexo.config
   };
 
-  ctx.url_for = require('../../../lib/plugins/helper/url_for').bind(ctx);
+  ctx.url_for = require('../../../lib/plugins/helper/url_for')(hexo);
 
   const js = require('../../../lib/plugins/helper/js').bind(ctx);
 
@@ -35,6 +35,8 @@ describe('js', () => {
       }
     });
   }
+
+  before(() => hexo.init());
 
   it('a string', () => {
     assertResult(js('script'), '/script.js');

@@ -9,7 +9,7 @@ describe('list_posts', () => {
     config: hexo.config
   };
 
-  ctx.url_for = require('../../../lib/plugins/helper/url_for').bind(ctx);
+  ctx.url_for = require('../../../lib/plugins/helper/url_for')(hexo);
 
   const listPosts = require('../../../lib/plugins/helper/list_posts').bind(ctx);
 
