@@ -8,6 +8,10 @@ describe('Page', () => {
   const Hexo = require('../../../lib/hexo');
   const hexo = new Hexo();
   const Page = hexo.model('Page');
+  const after_init = require('../../../lib/plugins/filter/after_init');
+  const applyConfigChange = () => after_init.call(hexo);
+
+  before(() => hexo.init());
 
   it('default values', () => {
     const now = Date.now();
@@ -63,42 +67,49 @@ describe('Page', () => {
 
   it('permalink - trailing_index', () => {
     hexo.config.pretty_urls.trailing_index = false;
+    applyConfigChange();
     return Page.insert({
       source: 'foo.md',
       path: 'bar/index.html'
     }).then(data => {
       data.permalink.should.eql(hexo.config.url + '/' + data.path.replace(/index\.html$/, ''));
       hexo.config.pretty_urls.trailing_index = true;
+      applyConfigChange();
       return Page.removeById(data._id);
     });
   });
 
   it('permalink - trailing_html', () => {
     hexo.config.pretty_urls.trailing_html = false;
+    applyConfigChange();
     return Page.insert({
       source: 'foo.md',
       path: 'bar/foo.html'
     }).then(data => {
       data.permalink.should.eql(hexo.config.url + '/' + data.path.replace(/\.html$/, ''));
       hexo.config.pretty_urls.trailing_html = true;
+      applyConfigChange();
       return Page.removeById(data._id);
     });
   });
 
   it('permalink - trailing_html - index.html', () => {
     hexo.config.pretty_urls.trailing_html = false;
+    applyConfigChange();
     return Page.insert({
       source: 'foo.md',
       path: 'bar/index.html'
     }).then(data => {
       data.permalink.should.eql(hexo.config.url + '/' + data.path);
       hexo.config.pretty_urls.trailing_html = true;
+      applyConfigChange();
       return Page.removeById(data._id);
     });
   });
 
   it('permalink - should be encoded', () => {
     hexo.config.url = 'http://fôo.com';
+    applyConfigChange();
     const path = 'bár';
     return Page.insert({
       source: 'foo',
@@ -106,6 +117,7 @@ describe('Page', () => {
     }).then(data => {
       data.permalink.should.eql(full_url_for.call(hexo, data.path));
       hexo.config.url = 'http://yoursite.com';
+      applyConfigChange();
       return Page.removeById(data._id);
     });
   });

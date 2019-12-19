@@ -18,6 +18,8 @@ describe('Hexo', () => {
   const Page = hexo.model('Page');
   const Data = hexo.model('Data');
   const route = hexo.route;
+  const after_init = require('../../../lib/plugins/filter/after_init');
+  const applyConfigChange = hexo => after_init.call(hexo);
 
   function checkStream(stream, expected) {
     return testUtil.stream.read(stream).then(data => {
@@ -79,6 +81,7 @@ describe('Hexo', () => {
   // Issue #3964
   it('theme_config - deep clone', () => {
     const hexo = new Hexo(__dirname);
+    applyConfigChange(hexo);
     hexo.theme.config = { a: { b: 1, c: 2 } };
     hexo.config.theme_config = { a: { b: 3 } };
     const Locals = hexo._generateLocals();
@@ -90,6 +93,7 @@ describe('Hexo', () => {
 
   it('theme_config - null theme.config', () => {
     const hexo = new Hexo(__dirname);
+    applyConfigChange(hexo);
     hexo.theme.config = null;
     hexo.config.theme_config = { c: 3 };
     const Locals = hexo._generateLocals();
@@ -453,6 +457,7 @@ describe('Hexo', () => {
   it('_generate() - should encode url', () => {
     const path = 'bár';
     hexo.config.url = 'http://fôo.com';
+    applyConfigChange(hexo);
 
     hexo.theme.setView('test.swig', '{{ url }}');
 

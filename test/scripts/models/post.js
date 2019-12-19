@@ -14,6 +14,8 @@ describe('Post', () => {
   const PostTag = hexo.model('PostTag');
   const PostCategory = hexo.model('PostCategory');
   const Asset = hexo.model('Asset');
+  const after_init = require('../../../lib/plugins/filter/after_init');
+  const applyConfigChange = () => after_init.call(hexo);
 
   before(() => {
     hexo.config.permalink = ':title';
@@ -88,12 +90,14 @@ describe('Post', () => {
   it('permalink - should be encoded', () => {
     const slug = 'bár';
     hexo.config.url = 'http://fôo.com';
+    applyConfigChange();
     return Post.insert({
       source: 'foo.md',
       slug
     }).then(data => {
       data.permalink.should.eql(full_url_for.call(hexo, slug));
       hexo.config.url = 'http://yoursite.com';
+      applyConfigChange();
       return Post.removeById(data._id);
     });
   });
@@ -101,12 +105,14 @@ describe('Post', () => {
   it('permalink - virtual - when set relative_link', () => {
     hexo.config.root = '/';
     hexo.config.relative_link = true;
+    applyConfigChange();
     return Post.insert({
       source: 'foo.md',
       slug: 'bar'
     }).then(data => {
       data.permalink.should.eql(hexo.config.url + '/' + data.path);
       hexo.config.relative_link = false;
+      applyConfigChange();
       return Post.removeById(data._id);
     });
   });
@@ -114,6 +120,7 @@ describe('Post', () => {
   it('permalink_root_prefix - virtual', () => {
     hexo.config.url = 'http://yoursite.com/root';
     hexo.config.root = '/root/';
+    applyConfigChange();
     return Post.insert({
       source: 'foo.md',
       slug: 'bar'
@@ -127,6 +134,7 @@ describe('Post', () => {
     hexo.config.url = 'http://yoursite.com/root';
     hexo.config.root = '/root/';
     hexo.config.relative_link = true;
+    applyConfigChange();
     return Post.insert({
       source: 'foo.md',
       slug: 'bar'
@@ -138,24 +146,28 @@ describe('Post', () => {
 
   it('permalink - trailing_index', () => {
     hexo.config.pretty_urls.trailing_index = false;
+    applyConfigChange();
     return Post.insert({
       source: 'foo.md',
       slug: 'bar/index.html'
     }).then(data => {
       data.permalink.should.eql(hexo.config.url + '/' + data.path.replace(/index\.html$/, ''));
       hexo.config.pretty_urls.trailing_index = true;
+      applyConfigChange();
       return Post.removeById(data._id);
     });
   });
 
   it('permalink - trailing_html', () => {
     hexo.config.pretty_urls.trailing_html = false;
+    applyConfigChange();
     return Post.insert({
       source: 'foo.md',
       slug: 'bar/foo.html'
     }).then(data => {
       data.permalink.should.eql(hexo.config.url + '/' + data.path.replace(/\.html$/, ''));
       hexo.config.pretty_urls.trailing_html = true;
+      applyConfigChange();
       return Post.removeById(data._id);
     });
   });

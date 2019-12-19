@@ -10,6 +10,8 @@ describe('Category', () => {
   const Category = hexo.model('Category');
   const Post = hexo.model('Post');
   const PostCategory = hexo.model('PostCategory');
+  const after_init = require('../../../lib/plugins/filter/after_init');
+  const applyConfigChange = () => after_init.call(hexo);
 
   before(() => hexo.init());
 
@@ -107,33 +109,39 @@ describe('Category', () => {
 
   it('permalink - trailing_index', () => {
     hexo.config.pretty_urls.trailing_index = false;
+    applyConfigChange();
     return Category.insert({
       name: 'foo'
     }).then(data => {
       data.permalink.should.eql(hexo.config.url + '/' + data.path.replace(/index\.html$/, ''));
       hexo.config.pretty_urls.trailing_index = true;
+      applyConfigChange();
       return Category.removeById(data._id);
     });
   });
 
   it('permalink - trailing_html', () => {
     hexo.config.pretty_urls.trailing_html = false;
+    applyConfigChange();
     return Category.insert({
       name: 'foo'
     }).then(data => {
       data.permalink.should.eql(hexo.config.url + '/' + data.path.replace(/\.html$/, ''));
       hexo.config.pretty_urls.trailing_html = true;
+      applyConfigChange();
       return Category.removeById(data._id);
     });
   });
 
   it('permalink - should be encoded', () => {
     hexo.config.url = 'http://fôo.com';
+    applyConfigChange();
     return Category.insert({
       name: '字'
     }).then(data => {
       data.permalink.should.eql(full_url_for.call(hexo, data.path));
       hexo.config.url = 'http://yoursite.com';
+      applyConfigChange();
       return Category.removeById(data._id);
     });
   });

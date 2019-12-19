@@ -13,6 +13,8 @@ describe('page', () => {
     return hexo.locals.toObject();
   }
 
+  before(() => hexo.init());
+
   it('default layout', () => Page.insert({
     source: 'foo',
     path: 'bar'

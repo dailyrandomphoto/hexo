@@ -10,6 +10,8 @@ describe('Tag', () => {
   const Tag = hexo.model('Tag');
   const Post = hexo.model('Post');
   const PostTag = hexo.model('PostTag');
+  const after_init = require('../../../lib/plugins/filter/after_init');
+  const applyConfigChange = () => after_init.call(hexo);
 
   before(() => hexo.init());
 
@@ -114,11 +116,13 @@ describe('Tag', () => {
 
   it('permalink - should be encoded', () => {
     hexo.config.url = 'http://fôo.com';
+    applyConfigChange();
     return Tag.insert({
       name: '字'
     }).then(data => {
       data.permalink.should.eql(full_url_for.call(hexo, data.path));
       hexo.config.url = 'http://yoursite.com';
+      applyConfigChange();
       return Tag.removeById(data._id);
     });
   });

@@ -15,6 +15,7 @@ describe('Console list', () => {
     sinon.stub(console, 'log').callsFake((...args) => {
       return log.apply(log, args);
     });
+    return hexo.init();
   });
 
   after(() => {
