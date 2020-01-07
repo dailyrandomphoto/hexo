@@ -1,5 +1,7 @@
 'use strict';
 
+const expect = require('chai').expect;
+
 describe('list_archives', () => {
   const Hexo = require('../../../lib/hexo');
   const hexo = new Hexo(__dirname);
@@ -223,5 +225,239 @@ describe('list_archives', () => {
     ].join(''));
 
     ctx.config.timezone = '';
+  });
+
+  it('relative_link: true', () => {
+    ctx.config.relative_link = true;
+    ctx.path = 'page/2/index.html';
+    const result = listArchives();
+    ctx.config.relative_link = false;
+    ctx.path = '';
+
+    result.should.eql([
+      '<ul class="archive-list">',
+      '<li class="archive-list-item"><a class="archive-list-link" href="../../archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li>',
+      '<li class="archive-list-item"><a class="archive-list-link" href="../../archives/2013/10/">October 2013</a><span class="archive-list-count">1</span></li>',
+      '<li class="archive-list-item"><a class="archive-list-link" href="../../archives/2013/06/">June 2013</a><span class="archive-list-count">2</span></li>',
+      '</ul>'
+    ].join(''));
+  });
+
+  it('relative_link: true - archive page', () => {
+    ctx.config.relative_link = true;
+    ctx.path = 'archives/2013/10/index.html';
+    const result = listArchives();
+    ctx.config.relative_link = false;
+    ctx.path = '';
+
+    result.should.eql([
+      '<ul class="archive-list">',
+      '<li class="archive-list-item"><a class="archive-list-link" href="../../2014/02/">February 2014</a><span class="archive-list-count">1</span></li>',
+      '<li class="archive-list-item"><a class="archive-list-link" href="">October 2013</a><span class="archive-list-count">1</span></li>',
+      '<li class="archive-list-item"><a class="archive-list-link" href="../06/">June 2013</a><span class="archive-list-count">2</span></li>',
+      '</ul>'
+    ].join(''));
+  });
+
+  describe('list_archives.cached', () => {
+    const cachedListArchives = require('../../../lib/plugins/helper/list_archives').cached.bind(ctx);
+
+    it('default', () => {
+      const result = cachedListArchives();
+
+      result.should.eql([
+        '<ul class="archive-list">',
+        '<li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a><span class="archive-list-count">2</span></li>',
+        '</ul>'
+      ].join(''));
+    });
+
+    it('type: yearly - return cached result', () => {
+      cachedListArchives();
+      // return cached data
+      const result = cachedListArchives({
+        type: 'yearly'
+      });
+
+      result.should.eql([
+        '<ul class="archive-list">',
+        '<li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a><span class="archive-list-count">2</span></li>',
+        '</ul>'
+      ].join(''));
+    });
+
+    it('page.lang', () => {
+      ctx.page.lang = 'zh-tw';
+      cachedListArchives();
+      // return cached data
+      const result = cachedListArchives({
+        type: 'yearly'
+      });
+      ctx.page.lang = '';
+
+      result.should.eql([
+        '<ul class="archive-list">',
+        '<li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">二月 2014</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">十月 2013</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">六月 2013</a><span class="archive-list-count">2</span></li>',
+        '</ul>'
+      ].join(''));
+    });
+
+    it('config.language', () => {
+      ctx.config.language = 'de';
+      cachedListArchives();
+      // return cached data
+      const result = cachedListArchives({
+        type: 'yearly'
+      });
+      ctx.config.language = '';
+
+      result.should.eql([
+        '<ul class="archive-list">',
+        '<li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02/">Februar 2014</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">Oktober 2013</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">Juni 2013</a><span class="archive-list-count">2</span></li>',
+        '</ul>'
+      ].join(''));
+    });
+
+    it('relative_link: true', () => {
+      ctx.config.relative_link = true;
+      ctx.path = 'page/2/index.html';
+      cachedListArchives();
+      // return cached data
+      const result = cachedListArchives({
+        type: 'yearly'
+      });
+      ctx.config.relative_link = false;
+      ctx.path = '';
+
+      result.should.eql([
+        '<ul class="archive-list">',
+        '<li class="archive-list-item"><a class="archive-list-link" href="../../archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="../../archives/2013/10/">October 2013</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="../../archives/2013/06/">June 2013</a><span class="archive-list-count">2</span></li>',
+        '</ul>'
+      ].join(''));
+    });
+
+    it('relative_link: true + page.lang', () => {
+      ctx.config.relative_link = true;
+      ctx.path = 'page/2/index.html';
+      ctx.page.lang = 'zh-tw';
+      cachedListArchives();
+      // return cached data
+      const result = cachedListArchives({
+        type: 'yearly'
+      });
+      ctx.config.relative_link = false;
+      ctx.path = '';
+      ctx.page.lang = '';
+
+      result.should.eql([
+        '<ul class="archive-list">',
+        '<li class="archive-list-item"><a class="archive-list-link" href="../../archives/2014/02/">二月 2014</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="../../archives/2013/10/">十月 2013</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="../../archives/2013/06/">六月 2013</a><span class="archive-list-count">2</span></li>',
+        '</ul>'
+      ].join(''));
+    });
+
+    it('relative_link: true - archive page', () => {
+      ctx.config.relative_link = true;
+      ctx.path = 'archives/2013/10/index.html';
+      cachedListArchives();
+      // return cached data
+      const result = cachedListArchives({
+        type: 'yearly'
+      });
+      ctx.config.relative_link = false;
+      ctx.path = '';
+
+      result.should.eql([
+        '<ul class="archive-list">',
+        '<li class="archive-list-item"><a class="archive-list-link" href="../../2014/02/">February 2014</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="">October 2013</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="../06/">June 2013</a><span class="archive-list-count">2</span></li>',
+        '</ul>'
+      ].join(''));
+    });
+
+    it('relative_link: true - root page ', () => {
+      ctx.config.relative_link = true;
+      ctx.path = 'test.html';
+      cachedListArchives();
+      // return cached data
+      const result = cachedListArchives({
+        type: 'yearly'
+      });
+      ctx.config.relative_link = false;
+      ctx.path = '';
+
+      result.should.eql([
+        '<ul class="archive-list">',
+        '<li class="archive-list-item"><a class="archive-list-link" href="archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="archives/2013/10/">October 2013</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="archives/2013/06/">June 2013</a><span class="archive-list-count">2</span></li>',
+        '</ul>'
+      ].join(''));
+    });
+
+    it('relative_link: true - path = "" ', () => {
+      ctx.config.relative_link = true;
+      ctx.path = '';
+      cachedListArchives();
+      // return cached data
+      const result = cachedListArchives({
+        type: 'yearly'
+      });
+      ctx.config.relative_link = false;
+      ctx.path = '';
+
+      result.should.eql([
+        '<ul class="archive-list">',
+        '<li class="archive-list-item"><a class="archive-list-link" href="archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="archives/2013/10/">October 2013</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="archives/2013/06/">June 2013</a><span class="archive-list-count">2</span></li>',
+        '</ul>'
+      ].join(''));
+    });
+
+    it('relative_link: true - path that ends with a slash', () => {
+      ctx.config.relative_link = true;
+      ctx.path = 'abc/';
+      cachedListArchives();
+      // return cached data
+      const result = cachedListArchives({
+        type: 'yearly'
+      });
+      ctx.config.relative_link = false;
+      ctx.path = '';
+
+      result.should.eql([
+        '<ul class="archive-list">',
+        '<li class="archive-list-item"><a class="archive-list-link" href="../archives/2014/02/">February 2014</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="../archives/2013/10/">October 2013</a><span class="archive-list-count">1</span></li>',
+        '<li class="archive-list-item"><a class="archive-list-link" href="../archives/2013/06/">June 2013</a><span class="archive-list-count">2</span></li>',
+        '</ul>'
+      ].join(''));
+    });
+
+    it('relative_link: true - path = null ', () => {
+      ctx.config.relative_link = true;
+      ctx.path = null;
+      expect(() => cachedListArchives()).to.throw();
+
+      ctx.path = undefined;
+      expect(() => cachedListArchives()).to.throw();
+
+      ctx.config.relative_link = false;
+      ctx.path = '';
+    });
   });
 });
